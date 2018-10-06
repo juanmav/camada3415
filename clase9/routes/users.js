@@ -41,15 +41,58 @@ router.get('/:userId', function (req, res) {
 });
 
 router.post('/', function (req, res) {
-    // creame un usuario.
+    let user = req.body;
+    console.log(user);
+    db.collection('User')
+        .insertOne(user, function (err, result) {
+
+            if(err){
+                res.json({ message: 'FALLO ALGO!'});
+            } else {
+                res.json(result);
+            }
+        })
+
 });
 
 router.put('/:id', function (req, res) {
-    // Actualizar!
+    let user = req.body;
+    let id = req.params.id;
+    let o_id = new ObjectID(id);
+
+    delete user._id;
+
+    db
+        .collection('User')
+        .updateOne(
+            { _id: o_id},
+            { $set: user },
+            function (err, result) {
+                if(err){
+                    res.json({ message: 'FALLO ALGO!'});
+                } else {
+                    res.json(result);
+                }
+            }
+        )
 });
 
 router.delete('/:id', function (req, res) {
-    // Borrar!
+    let id = req.params.id;
+    let o_id = new ObjectID(id);
+
+    db
+        .collection('User')
+        .deleteOne(
+            { _id: o_id},
+            function (err, result) {
+                if(err){
+                    res.json({ message: 'FALLO ALGO!'});
+                } else {
+                    res.json(result);
+                }
+            }
+        )
 });
 
 
