@@ -4,6 +4,10 @@ const cors = require('cors');
 const app = express();
 const userRouter = require('./routes/users');
 
+const moongose = require('mongoose');
+
+moongose.connect('mongodb://localhost:27017/camada3415');
+
 
 app.use(bodyParser.json());
 app.use(cors());

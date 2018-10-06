@@ -1,98 +1,56 @@
 const express = require('express');
 const router = express.Router();
 
-const MongoClient = require('mongodb');
-const ObjectID = MongoClient.ObjectID;
-
-let db;
-
-MongoClient.connect('mongodb://localhost:27017/camada3415', function(err, database){
-    if(err){
-        throw err
-    } else {
-        console.log('DB OK');
-        db = database;
-    }
-});
-
+const User = require('../models/user');
 
 router.get('/', function (req, res) {
     // Listado
-    db
-        .collection('User')
+    User
         .find({})
-        .toArray(function (err, users) {
-            console.log(users);
-            res.json(users);
-        })
-
+        .then(users => res.json(users))
+        .catch(err => res.json(err))
 });
 
 router.get('/:userId', function (req, res) {
     let id = req.params.userId;
-    let o_id = new ObjectID(id);
 
-    db.collection('User')
-        .find({ _id : o_id})
-        .toArray(function (err, users) {  // [ {...} ]
-            let user = users[0];
-            res.json(user);
-        })
+    User
+        .findById(id)
+        .then( user => res.json(user))
+        .catch( err => res.json(err));
 });
 
 router.post('/', function (req, res) {
-    let user = req.body;
-    console.log(user);
-    db.collection('User')
-        .insertOne(user, function (err, result) {
+    let data = req.body;
+    let user = new User(data);
 
-            if(err){
-                res.json({ message: 'FALLO ALGO!'});
-            } else {
-                res.json(result);
-            }
-        })
+    user
+        .save()
+        .then( result => res.json(result))
+        .catch( err => res.json(err))
 
 });
 
-router.put('/:id', function (req, res) {
-    let user = req.body;
-    let id = req.params.id;
-    let o_id = new ObjectID(id);
+router.put('/:userId', function (req, res) {
+    let data = req.body;
+    let id = req.params.userId;
 
-    delete user._id;
+    delete data._id;
 
-    db
-        .collection('User')
-        .updateOne(
-            { _id: o_id},
-            { $set: user },
-            function (err, result) {
-                if(err){
-                    res.json({ message: 'FALLO ALGO!'});
-                } else {
-                    res.json(result);
-                }
-            }
-        )
+    User
+        .findByIdAndUpdate(id, data)
+        .then(result => res.json(result))
+        .catch( err => res.json(err));
 });
 
-router.delete('/:id', function (req, res) {
-    let id = req.params.id;
-    let o_id = new ObjectID(id);
 
-    db
-        .collection('User')
-        .deleteOne(
-            { _id: o_id},
-            function (err, result) {
-                if(err){
-                    res.json({ message: 'FALLO ALGO!'});
-                } else {
-                    res.json(result);
-                }
-            }
-        )
+router.delete('/:userId', function (req, res) {
+    let id = req.params.userId;
+
+    User
+        .findByIdAndRemove(id)
+        .then(result => res.json(result))
+        .catch( err => res.json(err));
 });
 
 
