@@ -22,6 +22,10 @@ app.get('/', function (req, res) {
 
 app.use('/users/', userRouter);
 
+// Generar una ruta para Autos
+// Generar un modelo Auto (Marca, año, color, kilometros).
+// Hacer ABM y listar de AUto.
+
 
 
 app.listen(3000);
